@@ -6,12 +6,21 @@ Display your Mi Band's heart rate in the browser.
 
 ![Heart rate webapp](img/screenshot.png)
 
+## Requirements
+
+1. A device with Bluetooth support
+2. A browser that supports the Web Bluetooth API (check [here](https://caniuse.com/web-bluetooth))
+3. An auth key for your Mi Band (check out https://github.com/Freeyourgadget/Gadgetbridge/wiki/Huami-Server-Pairing)
+
 ## How to use
 
-1. You need a browser with web bluetooth support.
-2. You need to obtain an auth key for your Mi
-   Band (https://github.com/Freeyourgadget/Gadgetbridge/wiki/Huami-Server-Pairing)
-3. Try it out at [https://miband-5-heart-rate-monitor.netlify.app/](https://miband-5-heart-rate-monitor.netlify.app/)
+1. Go to https://miband-5-heart-rate-monitor.netlify.app/
+2. Insert your Mi Band's auth key
+3. Wear your Mi Band
+3. Click connect
+4. Wait about 30 seconds for it to receive measurements
+
+For troubleshooting, check the browser's developer console
 
 ## Inspiration
 
