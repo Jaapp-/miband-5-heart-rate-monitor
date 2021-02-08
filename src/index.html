@@ -19,9 +19,9 @@
             <a
               target="_blank"
               href="https://github.com/Freeyourgadget/Gadgetbridge/wiki/Huami-Server-Pairing"
-              >how to obtain</a
-            ></label
-          >
+              >what is this?</a
+            >
+          </label>
         </div>
         <div class="form-group">
           <input
@@ -50,17 +50,22 @@
       const keyInput = document.querySelector("#auth-key");
       const initBox = document.querySelector(".init");
       const hrBox = document.querySelector(".hr");
+      let authKey = localStorage.getItem("auth-key");
+      if (authKey) {
+        keyInput.value = authKey;
+      }
 
       connectButton.addEventListener("click", async () => {
         try {
-          const key = keyInput.value;
-          window.miband = new MiBand5(key);
+          authKey = keyInput.value;
+          window.miband = new MiBand5(authKey);
         } catch (e) {
           alert(e.message);
         }
         window.addEventListener("connected", (e) => {
           initBox.classList.add("d-none");
           hrBox.classList.remove("d-none");
+          localStorage.setItem("auth-key", authKey);
         });
         window.addEventListener("heartrate", (e) => {
           console.log("Got heartrate", e.detail);
