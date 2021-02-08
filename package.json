@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "watch": "esbuild --bundle src/index.js --outfile=src/bundle.js",
-    "build": "rm -r dist/* && esbuild --bundle src/index.js --outfile=dist/bundle.js && cp src/index.html src/style.css src/aes.js dist/",
+    "build": "rm -r dist/*; esbuild --bundle src/index.js --outfile=dist/bundle.js && cp src/index.html src/style.css src/aes.js dist/",
     "serve": "npm run watch & cd src; npx http-server",
     "serve:dist": "npm run build && cd dist; npx http-server",
     "lint": "prettier --write src/"
