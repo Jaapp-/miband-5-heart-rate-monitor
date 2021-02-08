@@ -56,12 +56,7 @@
       }
 
       connectButton.addEventListener("click", async () => {
-        try {
-          authKey = keyInput.value;
-          window.miband = new MiBand5(authKey);
-        } catch (e) {
-          alert(e.message);
-        }
+        authKey = keyInput.value;
         window.addEventListener("connected", (e) => {
           initBox.classList.add("d-none");
           hrBox.classList.remove("d-none");
@@ -72,7 +67,12 @@
           hr.innerText = e.detail;
           chart.update(e.detail);
         });
-        await window.miband.init();
+        try {
+          window.miband = new MiBand5(authKey);
+          await window.miband.init();
+        } catch (e) {
+          alert(e.message);
+        }
       });
     </script>
   </body>

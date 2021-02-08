@@ -1,4 +1,4 @@
-import { ADVERTISEMENT_SERVICE, CHAR_UUIDS, UUIDS } from "./constants.js";
+import {ADVERTISEMENT_SERVICE, CHAR_UUIDS, UUIDS} from "./constants.js";
 
 function buf2hex(buffer) {
   return Array.prototype.map
@@ -40,15 +40,14 @@ export class MiBand5 {
       optionalServices: [UUIDS.miband2, UUIDS.heartrate, UUIDS.miband1],
     });
     window.dispatchEvent(new CustomEvent("connected"));
-    if (!device) throw new Error("Couldn't find bluetooth device");
     await device.gatt.disconnect();
     const server = await device.gatt.connect();
-    if (!server) throw new Error("Couldn't find server");
+    console.log("Connected through gatt");
 
     this.services.miband1 = await server.getPrimaryService(UUIDS.miband1);
     this.services.miband2 = await server.getPrimaryService(UUIDS.miband2);
     this.services.heartrate = await server.getPrimaryService(UUIDS.heartrate);
-    console.log("Got services");
+    console.log("Services initialized");
 
     this.chars.auth = await this.services.miband2.getCharacteristic(
       CHAR_UUIDS.auth
@@ -62,7 +61,7 @@ export class MiBand5 {
     this.chars.sensor = await this.services.miband1.getCharacteristic(
       CHAR_UUIDS.sensor
     );
-    console.log("Got characteristics");
+    console.log("Characteristics initialized");
     await this.authenticate();
   }
 
@@ -70,21 +69,21 @@ export class MiBand5 {
     await this.startNotifications(this.chars.auth, async (e) => {
       const value = e.target.value.buffer;
       const cmd = buf2hex(value.slice(0, 3));
-      console.log("Auth char cb", cmd);
       if (cmd === "100101") {
         console.log("Set new key OK");
       } else if (cmd === "100201") {
         const number = value.slice(3);
-        console.log("Got random number", buf2hex(value.slice(3)));
+        console.log("Received authentication challenge: ", buf2hex(value.slice(3)));
         const key = aesjs.utils.hex.toBytes(this.authKey);
-        console.log("key", key, "number", number);
         const aesCbc = new aesjs.ModeOfOperation.cbc(key);
         const out = aesCbc.encrypt(new Uint8Array(number));
-        console.log("Encrypted: ", typeof out, out);
         const cmd = concatBuffers(new Uint8Array([3, 0]), out);
+        console.log("Sending authentication response");
         await this.chars.auth.writeValue(cmd);
       } else if (cmd === "100301") {
         await this.onAuthenticated();
+      } else if (cmd === "100308") {
+        console.log("Received authentication failure");
       } else {
         throw new Error(`Unknown callback, cmd='${cmd}'`);
       }
@@ -93,16 +92,17 @@ export class MiBand5 {
   }
 
   async onAuthenticated() {
-    console.log("Authenticated");
+    console.log("Authentication successful");
     window.dispatchEvent(new CustomEvent("authenticated"));
-    this.measureHr().then();
+    await this.measureHr();
   }
 
   async measureHr() {
+    console.log("Starting heart rate measurement")
     await this.chars.hrControl.writeValue(Uint8Array.from([0x15, 0x02, 0x00]));
     await this.chars.hrControl.writeValue(Uint8Array.from([0x15, 0x01, 0x00]));
     await this.startNotifications(this.chars.hrMeasure, (e) => {
-      console.log("Got heart rate", e.target.value);
+      console.log("Received heart rate value: ", e.target.value);
       const heartRate = e.target.value.getInt16();
       window.dispatchEvent(
         new CustomEvent("heartrate", {
@@ -116,7 +116,7 @@ export class MiBand5 {
     this.hrmTimer =
       this.hrmTimer ||
       setInterval(() => {
-        console.log("Pinging hrm");
+        console.log("Pinging heart rate monitor");
         this.chars.hrControl.writeValue(Uint8Array.from([0x16]));
       }, 12000);
   }
