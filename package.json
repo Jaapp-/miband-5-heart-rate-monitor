@@ -1,0 +1,17 @@
+{
+  "name": "miband5-web",
+  "author": "Jaap Heijligers",
+  "version": "1.0.0",
+  "scripts": {
+    "watch": "esbuild --bundle src/index.js --outfile=src/bundle.js",
+    "build": "rm -r dist/* && esbuild --bundle src/index.js --outfile=dist/bundle.js && cp src/index.html src/style.css src/aes.js dist/",
+    "serve": "npm run watch & cd src; npx http-server",
+    "serve:dist": "npm run build && cd dist; npx http-server"
+  },
+  "dependencies": {
+    "esbuild": "^0.8.43"
+  },
+  "devDependencies": {
+    "apexcharts": "^3.24.0"
+  }
+}
