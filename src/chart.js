@@ -25,7 +25,7 @@ export class Chart {
       },
       yaxis: {
         min: 0,
-        max: 160
+        max: 160,
       },
       series: [
         {
