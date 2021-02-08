@@ -5,12 +5,6 @@ const DATAPOINTS = 30;
 export class Chart {
   constructor(selector) {
     this.data = [];
-    // for (let i = 0; i < DATAPOINTS; i++) {
-    //   this.data.push({
-    //     x: new Date().getTime() + 1000 * (i - DATAPOINTS),
-    //     y: Math.floor(Math.random() * 100)
-    //   })
-    // }
     const options = {
       chart: {
         type: "area",
@@ -28,6 +22,10 @@ export class Chart {
       },
       tooltip: {
         enabled: false,
+      },
+      yaxis: {
+        min: 0,
+        max: 160
       },
       series: [
         {
